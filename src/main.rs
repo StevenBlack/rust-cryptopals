@@ -1,29 +1,26 @@
-//
-//
-
 use hex;
-use base64;
-use std::str;
-// extern crate regex;
 use regex::Regex;
+
+mod crpt {
+  use base64;
+  pub fn hex_to_base64(h: &str) -> String {
+    return base64::encode(hex::decode(h).unwrap());
+  }
+  pub fn hex_xor(h: &str, k: &str) -> String {
+    let o: Vec<u8> = hex::decode(h)
+      .unwrap()
+      .iter()
+      .zip(hex::decode(k).unwrap().iter().cycle())
+      .map(|(&x1, &x2)| x1 ^ x2)
+      .collect();
+    return hex::encode(o);
+  }
+}
 
 fn main() {
   wrap(&challenge1);
   wrap(&challenge2);
   wrap(&challenge3);
-}
-
-fn hex_to_base64(h: &str) -> String {
-    return base64::encode(hex::decode(h).unwrap());
-}
-
-fn hex_xor(h: &str, k: &str) -> String {
-  let o: Vec<u8> = hex::decode(h).unwrap()
-    .iter()
-    .zip(hex::decode(k).unwrap().iter().cycle())
-    .map(|(&x1, &x2)| x1 ^ x2)
-    .collect();
-  return hex::encode(o);
 }
 
 fn challenge3() {
@@ -35,7 +32,6 @@ fn challenge3() {
   let hex = "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736";
   println!("The hex is: {}", hex);
   println!("Possible plaintext:");
-
 
   // presume alphanumeric
   let re = Regex::new(r"[[:alpha:]]").unwrap();
@@ -51,10 +47,10 @@ fn challenge3() {
 
   let mut count = 0;
 
-  for kn in 1..=255 {
+  for kn in 0..=255 {
     let key = hex::encode([kn]).to_string();
     // hex::decode returns a rust Result<&str, Utf8Error>
-    let res = hex::decode(hex_xor(hex, &key));
+    let res = hex::decode(crpt::hex_xor(hex, &key));
     let s = match res {
       Ok(v) => v,
       Err(e) => panic!("Invalid UTF-8 sequence: {}", e),
@@ -65,7 +61,13 @@ fn challenge3() {
 
     let result = String::from_utf8_lossy(&s);
     // checks
-    if re.is_match(&result) && rvo.is_match(&result) && rs.is_match(&result) && !rl.is_match(&result) && !rr.is_match(&result) && !rv.is_match(&result) {
+    if re.is_match(&result)
+      && rvo.is_match(&result)
+      && rs.is_match(&result)
+      && !rl.is_match(&result)
+      && !rr.is_match(&result)
+      && !rv.is_match(&result)
+    {
       count = count + 1;
       println!("key is: {}, output is: {}", &key, result);
     }
@@ -85,7 +87,7 @@ fn challenge2() {
   let hex = "1c0111001f010100061a024b53535009181c";
   let key = "686974207468652062756c6c277320657965";
   let expected = "746865206b696420646f6e277420706c6179";
-  let result = hex_xor(hex, key);
+  let result = crpt::hex_xor(hex, key);
   assert_eq!(expected, result);
 
   println!("The hex is: {}", hex);
@@ -103,7 +105,7 @@ fn challenge1() {
 
   let hex = "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d";
   let expected = "SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t";
-  let result = hex_to_base64(hex);
+  let result = crpt::hex_to_base64(hex);
   assert_eq!(expected, result);
 
   println!("The hex value is: {}", hex);
@@ -120,4 +122,3 @@ fn wrap(f: &dyn Fn()) {
 fn sep() {
   println!("{}", "=====================".to_string());
 }
-
