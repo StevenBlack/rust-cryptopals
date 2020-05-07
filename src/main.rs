@@ -1,5 +1,8 @@
 // use hex;
 // use regex::Regex;
+use std::fs::File;
+use std::io::{self, BufRead};
+use std::path::Path;
 
 mod crpt {
   use base64;
@@ -69,9 +72,27 @@ mod crpt {
 }
 
 fn main() {
-  wrap(&challenge1);
-  wrap(&challenge2);
-  wrap(&challenge3);
+  wrap(&challenge1, 0);
+  wrap(&challenge2, 0);
+  wrap(&challenge3, 0);
+  wrap(&challenge4, 1);
+}
+
+fn challenge4() {
+  println!("Challenge 4");
+  // read the file line by line
+  if let Ok(lines) = read_lines("./files/challenge4.txt") {
+      // Consumes the iterator, returns an (Optional) String
+      for line in lines {
+          if let Ok(ip) = line {
+            println!("ct --> {}", ip);
+            let resultats = crpt::plausible_text(&ip);
+            for result in resultats.iter() {
+              println!("key is: {}, output is: {}", result.key, result.value);
+            }
+          }
+      }
+  }
 }
 
 fn challenge3() {
@@ -130,7 +151,10 @@ fn challenge1() {
   println!("The base64 output expected is: {}", expected);
 }
 
-fn wrap(f: &dyn Fn()) {
+fn wrap(f: &dyn Fn(), run: i8) {
+  if run == 0 {
+    return;
+  }
   sep();
   f();
   sep()
@@ -138,4 +162,10 @@ fn wrap(f: &dyn Fn()) {
 
 fn sep() {
   println!("{}", "=====================".to_string());
+}
+
+fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
+where P: AsRef<Path>, {
+    let file = File::open(filename)?;
+    Ok(io::BufReader::new(file).lines())
 }
