@@ -13,7 +13,7 @@ mod crpt {
     pub value: String,
   }
 
-  pub fn plausible_text(hex : &str) -> Vec<KV> {
+  pub fn plausible_text(hex: &str) -> Vec<KV> {
     let mut ret_vec = Vec::new();
     // presume alphanumeric
     let ralpha = Regex::new(r"[[:alpha:]]").unwrap();
@@ -22,7 +22,7 @@ mod crpt {
     // presume vowel
     let rvowel = Regex::new(r"[a,e,i,o,u,A,E,I,O,U]").unwrap();
     // presume no line feeds, carriage returns, or vertical tabs
-    let rl = Regex::new(r"\n").unwrap();
+    // let rl = Regex::new(r"\n").unwrap();
     let rr = Regex::new(r"\r").unwrap();
     let rv = Regex::new(r"\v").unwrap();
 
@@ -35,12 +35,17 @@ mod crpt {
         Err(e) => panic!("Invalid UTF-8 sequence: {}", e),
       };
 
+      // discard if any u8 element is above 128
+      if s.iter().max().unwrap() > &127u8 {
+        break;
+      }
+
       let result = String::from_utf8_lossy(&s);
       // checks
       if ralpha.is_match(&result)
         && rvowel.is_match(&result)
         && rs.is_match(&result)
-        && !rl.is_match(&result)
+        // && !rl.is_match(&result)
         && !rr.is_match(&result)
         && !rv.is_match(&result)
       {
@@ -82,16 +87,16 @@ fn challenge4() {
   println!("Challenge 4");
   // read the file line by line
   if let Ok(lines) = read_lines("./files/challenge4.txt") {
-      // Consumes the iterator, returns an (Optional) String
-      for line in lines {
-          if let Ok(ip) = line {
-            println!("ct --> {}", ip);
-            let resultats = crpt::plausible_text(&ip);
-            for result in resultats.iter() {
-              println!("key is: {}, output is: {}", result.key, result.value);
-            }
-          }
+    // Consumes the iterator, returns an (Optional) String
+    for line in lines {
+      if let Ok(ip) = line {
+        println!("ct --> {}", ip);
+        let resultats = crpt::plausible_text(&ip);
+        for result in resultats.iter() {
+          println!("key is: {}, output is: {}", result.key, result.value);
+        }
       }
+    }
   }
 }
 
@@ -165,7 +170,9 @@ fn sep() {
 }
 
 fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
-where P: AsRef<Path>, {
-    let file = File::open(filename)?;
-    Ok(io::BufReader::new(file).lines())
+where
+  P: AsRef<Path>,
+{
+  let file = File::open(filename)?;
+  Ok(io::BufReader::new(file).lines())
 }
