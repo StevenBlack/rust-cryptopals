@@ -3,6 +3,7 @@
 use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
+use indoc::indoc;
 
 mod crpt {
   use base64;
@@ -59,6 +60,15 @@ mod crpt {
     return ret_vec;
   }
 
+  pub fn encrypt_to_hex(key: String, message: String) -> String {
+    let vecu8: Vec<u8> = message.into_bytes()
+    .iter()
+      .zip(key.into_bytes().iter().cycle())
+      .map(|(&x1, &x2)| x1 ^ x2)
+      .collect();
+    return hex::encode(vecu8);
+  }
+
   // hex_to_base64 takes a hex str and returns a base64 String.
   pub fn hex_to_base64(h: &str) -> String {
     return base64::encode(hex::decode(h).unwrap());
@@ -80,7 +90,34 @@ fn main() {
   wrap(&challenge1, 0);
   wrap(&challenge2, 0);
   wrap(&challenge3, 0);
-  wrap(&challenge4, 1);
+  wrap(&challenge4, 0);
+  wrap(&challenge5, 1);
+}
+
+fn challenge5() {
+  println!("Challenge 5");
+  // feed it the string:
+  // Burning 'em, if you ain't quick and nimble
+  // I go crazy when I hear a cymbal
+  // ... after XOR'd with `iCE`
+  // ... should produce:
+  // 0b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343c2a26226324272765272
+  // a282b2f20430a652e2c652a3124333a653e2b2027630c692b20283165286326302e27282f
+
+  let msg = indoc!(r#"
+  Burning 'em, if you ain't quick and nimble 
+  I go crazy when I hear a cymbal"#).to_string();
+  let key = "ICE".to_string();
+  let expected = indoc!(r#"
+  0b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343c2a26226324272765272
+  a282b2f20430a652e2c652a3124333a653e2b2027630c692b20283165286326302e27282f"#).to_string();
+  let result = crpt::encrypt_to_hex(key.clone(), msg.clone());
+  assert_eq!(expected, result);
+
+  println!("The hex is: {}", msg.clone());
+  println!("The key is: {}", key.clone());
+  println!("The XOR output is: {}", result);
+  println!("The XOR output expected is: {}", expected);
 }
 
 fn challenge4() {
