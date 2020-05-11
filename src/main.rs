@@ -1,9 +1,9 @@
 // use hex;
 // use regex::Regex;
+use indoc::indoc;
 use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
-use indoc::indoc;
 
 mod crpt {
   use base64;
@@ -61,8 +61,9 @@ mod crpt {
   }
 
   pub fn encrypt_to_hex(key: String, message: String) -> String {
-    let vecu8: Vec<u8> = message.into_bytes()
-    .iter()
+    let vecu8: Vec<u8> = message
+      .into_bytes()
+      .iter()
       .zip(key.into_bytes().iter().cycle())
       .map(|(&x1, &x2)| x1 ^ x2)
       .collect();
@@ -91,7 +92,16 @@ fn main() {
   wrap(&challenge2, 0);
   wrap(&challenge3, 0);
   wrap(&challenge4, 0);
-  wrap(&challenge5, 1);
+  wrap(&challenge5, 0);
+  wrap(&challenge6, 1);
+}
+
+fn challenge6() {
+  use hamming::distance;
+  println!("Challenge 6");
+  let s1 = b"this is a test";
+  let s2 = b"wokka wokka!!!";
+  assert_eq!(distance(s1, s2), 37);
 }
 
 fn challenge5() {
@@ -104,13 +114,19 @@ fn challenge5() {
   // 0b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343c2a26226324272765272
   // a282b2f20430a652e2c652a3124333a653e2b2027630c692b20283165286326302e27282f
 
-  let msg = indoc!(r#"
+  let msg = indoc!(
+    r#"
   Burning 'em, if you ain't quick and nimble 
-  I go crazy when I hear a cymbal"#).to_string();
+  I go crazy when I hear a cymbal"#
+  )
+  .to_string();
   let key = "ICE".to_string();
-  let expected = indoc!(r#"
+  let expected = indoc!(
+    r#"
   0b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343c2a26226324272765272
-  a282b2f20430a652e2c652a3124333a653e2b2027630c692b20283165286326302e27282f"#).to_string();
+  a282b2f20430a652e2c652a3124333a653e2b2027630c692b20283165286326302e27282f"#
+  )
+  .to_string();
   let result = crpt::encrypt_to_hex(key.clone(), msg.clone());
   assert_eq!(expected, result);
 
