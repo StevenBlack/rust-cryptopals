@@ -93,12 +93,40 @@ fn main() {
   wrap(&challenge3, 0);
   wrap(&challenge4, 0);
   wrap(&challenge5, 0);
+  wrap(&challenge6prelim, 0);
   wrap(&challenge6, 1);
 }
 
 fn challenge6() {
   use hamming::distance;
-  println!("Challenge 6");
+  // step 1: load the file into a string
+  // read the file line by line and consolidate
+  let mut ciphertext: String = "".to_string();
+  if let Ok(lines) = read_lines("./files/challenge6.txt") {
+    // Consumes the iterator, returns an (Optional) String
+    for l in lines {
+      if let Ok(line) = l {
+        ciphertext.push_str(&line)
+      }
+    }
+  }
+  // step 2: Take two consecutive KeyLength chunks, calculate the distance between them
+  let cipherbites = ciphertext.into_bytes();
+  let mut key_length: i8 = 0;
+  for kl in 1..=100 {
+    let mut iter = cipherbites.chunks_exact(kl);
+    let chunk1 = iter.next().unwrap();
+    let chunk2 = iter.next().unwrap();
+    let dist: u64 = distance(chunk1, chunk2);
+    let avg = (dist / (kl as u64)) as f32;
+    // println!("key length: {} - avg distance: {:?}", kl, avg);
+    println!("{:.4}", avg);
+  }
+}
+
+fn challenge6prelim() {
+  use hamming::distance;
+  println!("Challenge 6 preliminary");
   let s1 = b"this is a test";
   let s2 = b"wokka wokka!!!";
   assert_eq!(distance(s1, s2), 37);
