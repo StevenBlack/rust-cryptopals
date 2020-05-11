@@ -111,10 +111,10 @@ fn challenge6() {
     }
   }
   // step 2: Take two consecutive KeyLength chunks, calculate the distance between them
-  let cipherbites = base64::decode(ciphertext).unwrap();
+  let cipherbytes = base64::decode(ciphertext).unwrap();
   let mut key_length: i8 = 0;
   for kl in 1..=100 {
-    let mut iter = cipherbites.chunks_exact(kl);
+    let mut iter = cipherbytes.chunks_exact(kl);
     let chunk1 = iter.next().unwrap();
     let chunk2 = iter.next().unwrap();
     let dist: u64 = distance(chunk1, chunk2);
