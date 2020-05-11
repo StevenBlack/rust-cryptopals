@@ -118,9 +118,9 @@ fn challenge6() {
     let chunk1 = iter.next().unwrap();
     let chunk2 = iter.next().unwrap();
     let dist: u64 = distance(chunk1, chunk2);
-    let avg = (dist / (kl as u64)) as f32;
+    let avg = (dist as f64 / (kl as f64)) as f64;
     // println!("key length: {} - avg distance: {:?}", kl, avg);
-    println!("{:.4}", avg);
+    println!("Key length: {} - average: {:.4}", kl, avg);
   }
 }
 
