@@ -94,7 +94,32 @@ fn main() {
   wrap(&challenge4, 0);
   wrap(&challenge5, 0);
   wrap(&challenge6prelim, 0);
-  wrap(&challenge6, 1);
+  wrap(&challenge6, 0);
+  wrap(&cumulator, 1);
+}
+
+fn cumulator() {
+  println!("Cumulator");
+
+  let mut cumulator = Cumulator::default();
+  cumulator.push(50);
+  cumulator.push(60);
+  cumulator.push(70);
+  println!("{}", cumulator.sum());
+
+  #[derive(Debug, Default)]
+  struct Cumulator {
+    entries: Vec<i64>,
+  }
+
+  impl Cumulator {
+    pub fn sum(self: &Self) -> i64 {
+      self.entries.iter().sum()
+    }
+    pub fn push(&mut self, n: i64) {
+      self.entries.push(n);
+    }
+  }
 }
 
 fn challenge6() {
@@ -144,7 +169,7 @@ fn challenge5() {
 
   let msg = indoc!(
     r#"
-  Burning 'em, if you ain't quick and nimble 
+  Burning 'em, if you ain't quick and nimble
   I go crazy when I hear a cymbal"#
   )
   .to_string();
