@@ -106,6 +106,7 @@ fn cumulator() {
   cumulator.push(60);
   cumulator.push(70);
   println!("{}", cumulator.sum());
+  println!("{}", cumulator.avg());
 
   #[derive(Debug, Default)]
   struct Cumulator {
@@ -115,6 +116,13 @@ fn cumulator() {
   impl Cumulator {
     pub fn sum(self: &Self) -> i64 {
       self.entries.iter().sum()
+    }
+    pub fn avg(self: &Self) -> f32 {
+      let length: usize = self.entries.len();
+      if length == 0 {
+        return 0.0;
+      }
+      return (self.sum() / self.entries.len() as i64) as f32;
     }
     pub fn push(&mut self, n: i64) {
       self.entries.push(n);
