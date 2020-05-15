@@ -94,44 +94,35 @@ fn main() {
   wrap(&challenge4, 0);
   wrap(&challenge5, 0);
   wrap(&challenge6prelim, 0);
-  wrap(&challenge6, 0);
-  wrap(&cumulator, 1);
-}
-
-fn cumulator() {
-  println!("Cumulator");
-
-  let mut cumulator = Cumulator::default();
-  cumulator.push(50);
-  cumulator.push(60);
-  cumulator.push(70);
-  println!("{}", cumulator.sum());
-  println!("{}", cumulator.avg());
-
-  #[derive(Debug, Default)]
-  struct Cumulator {
-    entries: Vec<i64>,
-  }
-
-  impl Cumulator {
-    pub fn sum(self: &Self) -> i64 {
-      self.entries.iter().sum()
-    }
-    pub fn avg(self: &Self) -> f32 {
-      let length: usize = self.entries.len();
-      if length == 0 {
-        return 0.0;
-      }
-      return (self.sum() / self.entries.len() as i64) as f32;
-    }
-    pub fn push(&mut self, n: i64) {
-      self.entries.push(n);
-    }
-  }
+  wrap(&challenge6, 1);
 }
 
 fn challenge6() {
   use hamming::distance;
+  use itertools::Itertools;
+  #[derive(Debug, Default)]
+  struct Cumulator {
+    entries: Vec<u64>,
+  }
+
+  impl Cumulator {
+    pub fn sum(self: &Self) -> u64 {
+      self.entries.iter().sum()
+    }
+    pub fn len(self: &Self) -> u64 {
+      return self.entries.len() as u64;
+    }
+    pub fn avg(self: &Self) -> f32 {
+      if self.entries.len() == 0 {
+        return 0.0;
+      }
+      return self.sum() as f32 / self.entries.len() as f32;
+    }
+    pub fn push(&mut self, n: u64) {
+      self.entries.push(n);
+    }
+  }
+
   // step 1: load the file into a string
   // read the file line by line and consolidate
   let mut ciphertext: String = "".to_string();
@@ -145,15 +136,18 @@ fn challenge6() {
   }
   // step 2: Take two consecutive KeyLength chunks, calculate the distance between them
   let cipherbytes = base64::decode(ciphertext).unwrap();
-  let mut key_length: i8 = 0;
-  for kl in 1..=100 {
-    let mut iter = cipherbytes.chunks_exact(kl);
-    let chunk1 = iter.next().unwrap();
-    let chunk2 = iter.next().unwrap();
-    let dist: u64 = distance(chunk1, chunk2);
-    let avg = (dist as f64 / (kl as f64)) as f64;
+  // our sampling – 8 in combinations of 2
+  // kl is key length
+  for kl in 1..=40 {
+    let mut cumulator = Cumulator::default();
+    for it in (0..4).combinations(2) {
+      let klvec = cipherbytes.chunks(kl).collect_vec();
+      // let dist: u64 = distance([klvec[it[0]]], [klvec[it[1]]]);
+      let dist: u64 = distance(klvec[it[0]], klvec[it[1]]);
+      cumulator.push(dist);
+    }
     // println!("key length: {} - avg distance: {:?}", kl, avg);
-    println!("Key length: {} - average: {:.4}", kl, avg);
+    println!("Key length: {} - length: {} - sum: {} - average: {:.4}", kl, cumulator.len(), cumulator.sum(),  cumulator.avg() / kl as f32);
   }
 }
 
