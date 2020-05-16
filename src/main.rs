@@ -88,16 +88,17 @@ mod crpt {
 }
 
 fn main() {
-  wrap(&challenge1, 0);
-  wrap(&challenge2, 0);
-  wrap(&challenge3, 0);
-  wrap(&challenge4, 0);
+  wrap(&challenge1, 1);
+  wrap(&challenge2, 1);
+  wrap(&challenge3, 1);
+  wrap(&challenge4, 1);
   wrap(&challenge5, 0);
-  wrap(&challenge6prelim, 0);
+  wrap(&challenge6prelim, 1);
   wrap(&challenge6, 1);
 }
 
 fn challenge6() {
+  println!("Challenge 6");
   use hamming::distance;
   use itertools::Itertools;
   #[derive(Debug, Default)]
@@ -136,18 +137,23 @@ fn challenge6() {
   }
   // step 2: Take two consecutive KeyLength chunks, calculate the distance between them
   let cipherbytes = base64::decode(ciphertext).unwrap();
-  // our sampling – 8 in combinations of 2
+
   // kl is key length
   for kl in 1..=40 {
     let mut cumulator = Cumulator::default();
+    // our sampling in combinations of 2
     for it in (0..4).combinations(2) {
       let klvec = cipherbytes.chunks(kl).collect_vec();
-      // let dist: u64 = distance([klvec[it[0]]], [klvec[it[1]]]);
       let dist: u64 = distance(klvec[it[0]], klvec[it[1]]);
       cumulator.push(dist);
     }
-    // println!("key length: {} - avg distance: {:?}", kl, avg);
-    println!("Key length: {} - length: {} - sum: {} - average: {:.4}", kl, cumulator.len(), cumulator.sum(),  cumulator.avg() / kl as f32);
+    println!(
+      "Key length: {} - length: {} - sum: {} - average: {:.4}",
+      kl,
+      cumulator.len(),
+      cumulator.sum(),
+      cumulator.avg() / kl as f32
+    );
   }
 }
 
