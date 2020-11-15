@@ -88,10 +88,10 @@ mod crpt {
 }
 
 fn main() {
-  wrap(&challenge1, 1);
-  wrap(&challenge2, 1);
-  wrap(&challenge3, 1);
-  wrap(&challenge4, 1);
+  wrap(&challenge1, 0);
+  wrap(&challenge2, 0);
+  wrap(&challenge3, 0);
+  wrap(&challenge4, 0);
   wrap(&challenge5, 0);
   wrap(&challenge6prelim, 1);
   wrap(&challenge6, 1);
@@ -184,8 +184,7 @@ fn challenge5() {
   let key = "ICE".to_string();
   let expected = indoc!(
     r#"
-  0b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343c2a26226324272765272
-  a282b2f20430a652e2c652a3124333a653e2b2027630c692b20283165286326302e27282f"#
+  0b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343c2a26226324272765272a282b2f20430a652e2c652a3124333a653e2b2027630c692b20283165286326302e27282f"#
   )
   .to_string();
   let result = crpt::encrypt_to_hex(key.clone(), msg.clone());
@@ -193,18 +192,20 @@ fn challenge5() {
 
   println!("The hex is: {}", msg.clone());
   println!("The key is: {}", key.clone());
-  println!("The XOR output is: {}", result);
-  println!("The XOR output expected is: {}", expected);
+  println!("The XOR output is:   {}", result);
+  println!("The XOR expected is: {}", expected);
 }
 
 fn challenge4() {
   println!("Challenge 4");
   // read the file line by line
   if let Ok(lines) = read_lines("./files/challenge4.txt") {
+    let mut counter = 0;
     // Consumes the iterator, returns an (Optional) String
     for line in lines {
       if let Ok(ip) = line {
-        println!("ct --> {}", ip);
+        counter = counter + 1;
+        println!("ciphertext {} --> {}", counter, ip);
         let resultats = crpt::plausible_text(&ip);
         for result in resultats.iter() {
           println!("key is: {}, output is: {}", result.key, result.value);
