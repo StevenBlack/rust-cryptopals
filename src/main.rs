@@ -93,7 +93,7 @@ fn main() {
   wrap(&challenge3, 0);
   wrap(&challenge4, 0);
   wrap(&challenge5, 0);
-  wrap(&challenge6prelim, 1);
+  wrap(&challenge6prelim, 0);
   wrap(&challenge6, 1);
 }
 
@@ -142,7 +142,7 @@ fn challenge6() {
   for kl in 1..=40 {
     let mut cumulator = Cumulator::default();
     // our sampling in combinations of 2
-    for it in (0..4).combinations(2) {
+    for it in (0..2).combinations(2) {
       let klvec = cipherbytes.chunks(kl).collect_vec();
       let dist: u64 = distance(klvec[it[0]], klvec[it[1]]);
       cumulator.push(dist);
