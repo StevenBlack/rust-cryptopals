@@ -159,18 +159,6 @@ fn challenge6() {
         }
     }
 
-    struct Foo(Vec<Resultat>);
-
-    impl fmt::Display for Foo {
-        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-            write!(f, "Values:\n")?;
-            for v in &self.0 {
-                write!(f, "\t{}", v)?;
-            }
-            Ok(())
-        }
-    }
-
     let mut resultats = Vec::new();
 
     for kl in klmin..=klmax {
@@ -197,7 +185,7 @@ fn challenge6() {
         );
     }
     resultats.sort_by(|a, b| a.avgdistance.partial_cmp(&b.avgdistance).unwrap());
-    println!("{:?}", &resultats[0..4]);
+    println!("{:#?}", &resultats[0..4]);
 }
 
 fn challenge6prelim() {
